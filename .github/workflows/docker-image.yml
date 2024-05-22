@@ -16,16 +16,21 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout target repo
+      uses: actions/checkout@v4
+      with:
+        ref:  master
+        persist-credentials: false
     - name: Pull (Fast-Forward) upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v2.1
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
       with:
         upstream_repository: muety/anchr
         upstream_branch: master
         target_branch: master
         git_pull_args: --rebase                    # optional arg use, defaults to simple 'pull'
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag ghcr.io/aleritty/anchr:latest
     - name: Log in to the Container registry
