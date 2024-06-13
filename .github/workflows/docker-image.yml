@@ -2,11 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
-  schedule: 
-   - cron: '0 4 * * 6'
+    branches: ["master"]
+  schedule:
+    - cron: "0 4 * * 6"
   workflow_dispatch:
 
 jobs:
@@ -17,26 +17,27 @@ jobs:
       contents: write
 
     steps:
-    - name: Checkout target repo
-      uses: actions/checkout@v4
-      with:
-        ref:  master
-        persist-credentials: false
-    - uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
-      with:
-        target_sync_branch: master
-        target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-        upstream_sync_branch: master
-        upstream_sync_repo: muety/anchr
-        upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+        with:
+          target_sync_branch: master
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_branch: master
+          upstream_sync_repo: muety/anchr
+          upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+      - name: apply my patches
+        run: git cherry-pick main-patch
 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ghcr.io/aleritty/anchr:latest
-    - name: Log in to the Container registry
-      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-      with:
-        registry: ghcr.io
-        username: aleritty
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Push the docker image to ghcr.io
-      run: docker push ghcr.io/aleritty/anchr:latest
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag ghcr.io/aleritty/anchr:latest
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: aleritty
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push the docker image to ghcr.io
+        run: docker push ghcr.io/aleritty/anchr:latest
