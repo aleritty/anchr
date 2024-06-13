@@ -20,7 +20,7 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          fetch-depth: 0
       - uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
           target_sync_branch: master
@@ -29,7 +29,7 @@ jobs:
           upstream_sync_repo: muety/anchr
           upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
       - name: apply my patches
-        run: git cherry-pick main-patch
+        run: git checkout master-patch -- manifest.webmanifest screenshot-wide.jpg screenshot.jpg
 
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag ghcr.io/aleritty/anchr:latest
